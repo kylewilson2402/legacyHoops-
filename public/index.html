@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Legacy Hoops — High School Dynasty</title>
+  <meta name="description" content="Build a high school basketball dynasty. Single-player management sim." />
+
+  <!-- Athletic condensed display face + humanist body face. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet" />
+
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Sidebar navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <span class="brand-mark">LH</span>
+        <span class="brand-text">
+          <strong>Legacy Hoops</strong>
+          <small>High School Dynasty</small>
+        </span>
+      </div>
+
+      <nav class="nav" aria-label="Primary">
+        <a class="nav-link" href="#/home" data-route="home"><span class="nav-ico">🏠</span><span class="nav-label">Home</span></a>
+        <a class="nav-link" href="#/dashboard" data-route="dashboard"><span class="nav-ico">📋</span><span class="nav-label">Dashboard</span></a>
+        <a class="nav-link" href="#/roster" data-route="roster"><span class="nav-ico">👥</span><span class="nav-label">Roster</span></a>
+        <a class="nav-link" href="#/schedule" data-route="schedule"><span class="nav-ico">🗓️</span><span class="nav-label">Schedule</span></a>
+        <a class="nav-link" href="#/standings" data-route="standings"><span class="nav-ico">📊</span><span class="nav-label">Standings</span></a>
+        <a class="nav-link" href="#/news" data-route="news"><span class="nav-ico">📰</span><span class="nav-label">News</span></a>
+        <a class="nav-link" href="#/recruiting" data-route="recruiting"><span class="nav-ico">🎯</span><span class="nav-label">Recruiting</span></a>
+        <a class="nav-link" href="#/history" data-route="history"><span class="nav-ico">🏆</span><span class="nav-label">History</span></a>
+        <a class="nav-link" href="#/settings" data-route="settings"><span class="nav-ico">⚙️</span><span class="nav-label">Settings</span></a>
+      </nav>
+
+      <div class="sidebar-foot">
+        <small>MVP build</small>
+      </div>
+    </aside>
+
+    <!-- Topbar + main content -->
+    <div class="main-col">
+      <header class="topbar">
+        <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+        <div class="topbar-team" id="topbarTeam">
+          <span class="crest" id="topbarCrest" style="--c1:var(--hardwood);--c2:var(--line)"></span>
+          <div class="topbar-team-meta">
+            <strong id="topbarName">Legacy Hoops</strong>
+            <small id="topbarSub">No career loaded</small>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <span class="topbar-season" id="topbarSeason"></span>
+          <button class="btn btn-primary" id="topbarSim" hidden>Simulate</button>
+        </div>
+      </header>
+
+      <main id="view" class="view" tabindex="-1">
+        <!-- View modules render here -->
+      </main>
+    </div>
+  </div>
+
+  <!-- Mobile bottom nav -->
+  <nav class="bottom-nav" aria-label="Mobile primary">
+    <a href="#/dashboard" data-route="dashboard">📋</a>
+    <a href="#/roster" data-route="roster">👥</a>
+    <a href="#/schedule" data-route="schedule">🗓️</a>
+    <a href="#/standings" data-route="standings">📊</a>
+    <a href="#/recruiting" data-route="recruiting">🎯</a>
+  </nav>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
