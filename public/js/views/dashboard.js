@@ -7,9 +7,10 @@ export async function render(container) {
   if (!ctx) return;
   const { career, team } = ctx;
 
-  const [standings, games] = await Promise.all([
+  const [standings, games, news] = await Promise.all([
     apiGet(`/api/schedule/${career.id}/standings`),
     apiGet(`/api/schedule/${career.id}`),
+    apiGet(`/api/news/${career.id}?limit=4`),
   ]);
 
   const me = standings.find((s) => s.team_id === team.id) || { wins: 0, losses: 0, rank: '-', diff: 0, streak: 0 };
@@ -52,9 +53,19 @@ export async function render(container) {
     </div>
   </div>`;
 
+  const newsWidget = `<div class="card">
+    <div class="row spread"><div class="eyebrow">Recent news</div><a class="muted" href="#/news" style="font-size:.8rem">All news →</a></div>
+    ${news.items.length ? `<div class="stack" style="margin-top:8px">${news.items.map((n) => `
+      <div class="news-mini">
+        <span class="tag ${n.category === 'Upset' ? 'loss' : n.category === 'Championship' ? 'win' : ''}">${esc(n.category)}</span>
+        <span>${esc(n.headline)}</span>
+      </div>`).join('')}</div>`
+      : emptyState('📰', 'No news yet — simulate to make headlines.')}
+  </div>`;
+
   container.innerHTML = pageHead(`${team.name}`, `Coach ${esc(career.coach_first)} ${esc(career.coach_last)} · ${esc(career.archetype)}`)
     + `<div class="grid grid-3">${recordCard}${lastCard}${nextCard}</div>`
-    + `<div style="margin-top:16px">${progress}</div>`;
+    + `<div class="grid grid-2" style="margin-top:16px">${progress}${newsWidget}</div>`;
 
   const ds = container.querySelector('#dashSim');
   if (ds) ds.addEventListener('click', async () => {
