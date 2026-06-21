@@ -4,6 +4,10 @@
 
 const path = require('path');
 const express = require('express');
+const migrate = require('./src/db/migrate');
+
+// Ensure the schema exists before serving requests.
+migrate();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
