@@ -31,6 +31,21 @@ export function placeholder(container, title, note) {
     + `<div class="card">${emptyState('🏀', note || 'This page is wired up and ready for data.')}</div>`;
 }
 
+// Map a schedule/game row (from getSchedule/box) to scorebug props.
+export function gameToScorebug(g) {
+  const played = g.played === 1;
+  return scorebug({
+    homeAbbr: g.home_abbrev, awayAbbr: g.away_abbrev,
+    homeName: g.home_name, awayName: g.away_name,
+    homeColor: g.home_color, awayColor: g.away_color,
+    homeScore: played ? g.home_score : null,
+    awayScore: played ? g.away_score : null,
+    tag: g.is_playoff ? (g.round || 'PO') : (played ? 'FINAL' : `WK ${g.week}`),
+    homeWin: played && g.home_score > g.away_score,
+    awayWin: played && g.away_score > g.home_score,
+  });
+}
+
 // Broadcast scorebug. game = { homeAbbr, awayAbbr, homeName, awayName,
 //   homeScore, awayScore, homeColor, awayColor, tag, homeWin, awayWin }
 export function scorebug(g) {

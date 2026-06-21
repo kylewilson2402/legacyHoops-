@@ -409,6 +409,22 @@ table.stat .min-input {
   * { transition: none !important; animation: none !important; }
 }
 
+/* Standings table extras */
+table.stat.standings tr.me { background: rgba(200,132,60,.12); }
+table.stat.standings tr.me td { border-color: rgba(200,132,60,.3); }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
+
+/* Schedule */
+.week { margin-bottom: 26px; }
+.week-head h3 { margin: 0 0 12px; }
+.week.current .week-head h3 { color: var(--hardwood-bright); }
+.sched-game.mine .scorebug { border-color: var(--hardwood); box-shadow: 0 0 0 1px var(--hardwood) inset, var(--shadow); }
+.sched-game.clickable .scorebug { cursor: pointer; }
+.sched-game.clickable .scorebug:hover { border-color: var(--hardwood-bright); }
+.box-slot:empty { display: none; }
+.box-detail { margin-top: 8px; display: grid; gap: 10px; }
+.box-detail table.stat { font-size: .76rem; }
+
 /* Utility */
 .muted { color: var(--chalk-dim); }
 .mono { font-family: var(--font-mono); }

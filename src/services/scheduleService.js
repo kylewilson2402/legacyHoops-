@@ -77,4 +77,56 @@ function getSchedule(careerId, seasonYear) {
   `).all(careerId, year);
 }
 
-module.exports = { generateSchedule, getSchedule, REG_WEEKS, PLAYOFF_WEEKS };
+// Compute standings on the fly from played REGULAR-SEASON games. Ranked by
+// win% then point differential. Includes PF/PA/diff and current W/L streak.
+function computeStandings(careerId, seasonYear) {
+  const career = db.prepare('SELECT season_year FROM careers WHERE id=?').get(careerId);
+  const year = seasonYear || career.season_year;
+  const teams = getTeams(careerId);
+
+  const games = db.prepare(`
+    SELECT * FROM games
+    WHERE career_id=? AND season_year=? AND is_playoff=0 AND played=1
+    ORDER BY week, id
+  `).all(careerId, year);
+
+  const rows = teams.map((t) => ({
+    team_id: t.id, name: t.name, abbrev: t.abbrev,
+    color_primary: t.color_primary, color_secondary: t.color_secondary,
+    is_user_team: t.is_user_team,
+    wins: 0, losses: 0, pf: 0, pa: 0, diff: 0, win_pct: 0, streak: 0,
+    _results: [],
+  }));
+  const byId = new Map(rows.map((r) => [r.team_id, r]));
+
+  for (const g of games) {
+    const home = byId.get(g.home_team_id);
+    const away = byId.get(g.away_team_id);
+    if (!home || !away) continue;
+    home.pf += g.home_score; home.pa += g.away_score;
+    away.pf += g.away_score; away.pa += g.home_score;
+    const homeWon = g.home_score > g.away_score;
+    if (homeWon) { home.wins++; away.losses++; home._results.push('W'); away._results.push('L'); }
+    else { away.wins++; home.losses++; away._results.push('W'); home._results.push('L'); }
+  }
+
+  for (const r of rows) {
+    const gp = r.wins + r.losses;
+    r.diff = r.pf - r.pa;
+    r.win_pct = gp ? +(r.wins / gp).toFixed(3) : 0;
+    // streak: trailing run of identical results
+    let s = 0, last = null;
+    for (let i = r._results.length - 1; i >= 0; i--) {
+      if (last === null) last = r._results[i];
+      if (r._results[i] === last) s++; else break;
+    }
+    r.streak = last ? (last === 'W' ? s : -s) : 0;
+    delete r._results;
+  }
+
+  rows.sort((a, b) => (b.win_pct - a.win_pct) || (b.diff - a.diff) || (b.pf - a.pf));
+  rows.forEach((r, i) => { r.rank = i + 1; });
+  return rows;
+}
+
+module.exports = { generateSchedule, getSchedule, computeStandings, REG_WEEKS, PLAYOFF_WEEKS };

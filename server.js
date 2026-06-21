@@ -27,6 +27,7 @@ app.use('/api/careers', require('./src/routes/careers'));
 app.use('/api/league', require('./src/routes/league'));
 app.use('/api/roster', require('./src/routes/roster'));
 app.use('/api/schedule', require('./src/routes/schedule'));
+app.use('/api/sim', require('./src/routes/sim'));
 
 // ---------------------------------------------------------------------------
 // Static SPA

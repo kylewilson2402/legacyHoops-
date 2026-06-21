@@ -42,14 +42,19 @@ function makeRng(seed) {
     return pairs[pairs.length - 1][0];
   }
 
-  // Normally distributed int (Box–Muller), clamped to [min,max].
-  function gaussianClamp(mean, sd, min, max) {
+  // Normally distributed float (Box–Muller).
+  function gaussian(mean, sd) {
     let u = 0, v = 0;
     while (u === 0) u = next();
     while (v === 0) v = next();
     const z = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
-    const val = Math.round(mean + z * sd);
-    return Math.max(min, Math.min(max, val));
+    return mean + z * sd;
+  }
+
+  // Normally distributed INT (rounded), clamped to [min,max]. Note: because it
+  // rounds, do NOT use this for sub-unit noise (use gaussian() for that).
+  function gaussianClamp(mean, sd, min, max) {
+    return Math.max(min, Math.min(max, Math.round(gaussian(mean, sd))));
   }
 
   // Shuffle a copy of arr (Fisher–Yates) — useful for schedule generation.
@@ -64,7 +69,7 @@ function makeRng(seed) {
 
   function chance(p) { return next() < p; }
 
-  return { next, randInt, pick, weighted, gaussianClamp, shuffle, chance };
+  return { next, randInt, pick, weighted, gaussian, gaussianClamp, shuffle, chance };
 }
 
 // Deterministically derive a child seed from a master seed + a salt. Lets us
