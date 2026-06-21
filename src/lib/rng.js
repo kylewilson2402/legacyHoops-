@@ -67,4 +67,13 @@ function makeRng(seed) {
   return { next, randInt, pick, weighted, gaussianClamp, shuffle, chance };
 }
 
-module.exports = { makeRng, mulberry32 };
+// Deterministically derive a child seed from a master seed + a salt. Lets us
+// give each team / the schedule its own reproducible stream from one career
+// seed, independent of database autoincrement ids.
+function mixSeed(a, b) {
+  let h = (a >>> 0) ^ Math.imul(((b >>> 0) + 0x9e3779b9) | 0, 0x85ebca6b);
+  h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35);
+  return (h ^ (h >>> 16)) >>> 0;
+}
+
+module.exports = { makeRng, mulberry32, mixSeed };

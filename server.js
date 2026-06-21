@@ -22,8 +22,11 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true, data: { status: 'up', time: new Date().toISOString() } });
 });
 
-// Route stubs are mounted here as later phases add them.
-// (Phase 3+ will mount careers/league/roster/schedule/etc.)
+// Feature routers.
+app.use('/api/careers', require('./src/routes/careers'));
+app.use('/api/league', require('./src/routes/league'));
+app.use('/api/roster', require('./src/routes/roster'));
+app.use('/api/schedule', require('./src/routes/schedule'));
 
 // ---------------------------------------------------------------------------
 // Static SPA
