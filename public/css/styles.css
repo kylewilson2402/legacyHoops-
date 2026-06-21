@@ -339,6 +339,30 @@ input:focus, select:focus { border-color: var(--hardwood); outline: none; }
 .choice strong { font-family: var(--font-display); text-transform: uppercase; display: block; margin-bottom: 4px; }
 .choice small { color: var(--chalk-dim); }
 
+/* Starter toggle in roster table */
+.star {
+  background: none;
+  border: none;
+  color: var(--line);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 6px 0 0;
+  vertical-align: middle;
+  transition: color .12s, transform .08s;
+}
+.star:hover { color: var(--chalk-dim); }
+.star.on { color: var(--hardwood); }
+.star:active { transform: scale(1.2); }
+table.stat .min-input {
+  background: var(--court);
+  border: 1px solid var(--line);
+  color: var(--chalk);
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-family: var(--font-mono);
+  text-align: right;
+}
+
 /* Attribute bars (player profiles) */
 .attrbar { display: grid; grid-template-columns: 90px 1fr 34px; align-items: center; gap: 8px; margin-bottom: 6px; }
 .attrbar .lbl { font-size: .78rem; color: var(--chalk-dim); text-transform: uppercase; }
