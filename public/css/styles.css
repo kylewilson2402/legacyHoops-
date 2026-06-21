@@ -425,6 +425,13 @@ table.stat.standings tr.me td { border-color: rgba(200,132,60,.3); }
 .box-detail { margin-top: 8px; display: grid; gap: 10px; }
 .box-detail table.stat { font-size: .76rem; }
 
+/* Recruiting */
+.stars { color: var(--hardwood); letter-spacing: 1px; }
+.interest { background: var(--court); border-radius: 999px; height: 8px; overflow: hidden; margin-bottom: 4px; }
+.interest-fill { height: 100%; background: linear-gradient(90deg, var(--hardwood), var(--hardwood-bright)); transition: width .2s; }
+.interest-fill.win { background: linear-gradient(90deg, var(--hardwood-bright), var(--whistle)); }
+.recruit-card .row.spread { align-items: flex-start; }
+
 /* Utility */
 .muted { color: var(--chalk-dim); }
 .mono { font-family: var(--font-mono); }

@@ -173,6 +173,18 @@ CREATE TABLE IF NOT EXISTS career_history (
   FOREIGN KEY (career_id) REFERENCES careers(id) ON DELETE CASCADE
 );
 
+-- Per-week recruiting action budget tracker (resets implicitly each week
+-- because rows are keyed by season_year + week).
+CREATE TABLE IF NOT EXISTS recruit_actions (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  career_id    INTEGER NOT NULL,
+  season_year  INTEGER NOT NULL,
+  week         INTEGER NOT NULL,
+  count        INTEGER NOT NULL DEFAULT 0,
+  FOREIGN KEY (career_id) REFERENCES careers(id) ON DELETE CASCADE
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_recruit_actions ON recruit_actions(career_id, season_year, week);
+
 -- Indexes for the hot lookups.
 CREATE INDEX IF NOT EXISTS idx_teams_career    ON teams(career_id);
 CREATE INDEX IF NOT EXISTS idx_players_career  ON players(career_id);
