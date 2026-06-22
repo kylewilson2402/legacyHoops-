@@ -1,5 +1,6 @@
 const express = require('express');
 const { createCareer, getCareer, listCareers, deleteCareer } = require('../services/careerService');
+const { advanceSeason } = require('../services/historyService');
 
 const router = express.Router();
 
@@ -28,6 +29,15 @@ router.get('/:id', (req, res) => {
     res.json({ ok: true, data: getCareer(Number(req.params.id)) });
   } catch (err) {
     res.status(404).json({ ok: false, error: err.message });
+  }
+});
+
+// POST /api/careers/:id/advance — run the offseason and start the next season
+router.post('/:id/advance', (req, res) => {
+  try {
+    res.json({ ok: true, data: advanceSeason(Number(req.params.id)) });
+  } catch (err) {
+    res.status(400).json({ ok: false, error: err.message });
   }
 });
 

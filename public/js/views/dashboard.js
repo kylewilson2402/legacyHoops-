@@ -37,7 +37,8 @@ export async function render(container) {
   const nextCard = `<div class="card">
     <div class="eyebrow">Next up</div>
     ${next ? gameToScorebug(next)
-      : (done ? emptyState('🏆', 'Season complete. Advance to the next season from Settings (coming soon).')
+      : (done ? `<div class="empty"><span class="empty-emoji">🏆</span><div>Season ${career.season_year} is in the books.</div>
+                 <button class="btn btn-primary" id="dashAdvance">Advance to next season</button></div>`
               : emptyState('🗓️', 'No upcoming games scheduled.'))}
     ${next && !done ? `<div class="row" style="margin-top:14px"><button class="btn btn-primary" id="dashSim">Simulate next game</button></div>` : ''}
   </div>`;
@@ -73,4 +74,40 @@ export async function render(container) {
     try { await apiPost('/api/sim/next', { careerId: career.id }); } catch (e) { console.error(e); }
     render(container);
   });
+
+  const adv = container.querySelector('#dashAdvance');
+  if (adv) adv.addEventListener('click', async () => {
+    adv.disabled = true; adv.textContent = 'Running offseason…';
+    try {
+      const summary = await apiPost(`/api/careers/${career.id}/advance`, {});
+      renderOffseason(container, summary, career.season_year);
+    } catch (e) { adv.disabled = false; adv.textContent = 'Advance to next season'; console.error(e); }
+  });
+}
+
+// Offseason recap screen shown after advancing a season.
+function renderOffseason(container, s, prevYear) {
+  const dev = s.developed.length
+    ? s.developed.slice(0, 10).map((p) => `<tr><td>${esc(p.name)}</td><td>${p.position}</td><td>${p.before}→<strong>${p.after}</strong></td><td class="pos">+${p.delta}</td></tr>`).join('')
+    : '<tr><td colspan="4" class="muted">No notable improvements.</td></tr>';
+  const grad = s.graduated.length
+    ? s.graduated.map((p) => `<li>${esc(p.name)} <span class="muted">(${p.position})</span></li>`).join('')
+    : '<li class="muted">No seniors graduated.</li>';
+  const sign = s.signed.length
+    ? s.signed.map((p) => `<li>${esc(p.name)} <span class="muted">(${p.position}) OVR ${p.overall} · POT ${p.potential}</span></li>`).join('')
+    : '<li class="muted">No recruits signed this cycle.</li>';
+
+  container.innerHTML = pageHead(`Offseason — Season ${prevYear} → ${s.season_year}`, `Coaching reputation: ${s.reputation}`)
+    + `<div class="grid grid-2">
+        <div class="card"><h3>Player development</h3>
+          <div class="table-wrap"><table class="stat"><thead><tr><th>Player</th><th>Pos</th><th>OVR</th><th>Δ</th></tr></thead><tbody>${dev}</tbody></table></div>
+        </div>
+        <div class="stack">
+          <div class="card"><h3>Graduated seniors</h3><ul class="plain">${grad}</ul></div>
+          <div class="card"><h3>Incoming freshmen</h3><ul class="plain">${sign}</ul></div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:18px"><button class="btn btn-primary" id="contSeason">Start Season ${s.season_year}</button></div>`;
+
+  container.querySelector('#contSeason').addEventListener('click', () => render(container));
 }

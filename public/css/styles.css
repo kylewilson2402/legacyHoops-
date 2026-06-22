@@ -437,6 +437,10 @@ table.stat.standings tr.me td { border-color: rgba(200,132,60,.3); }
 .interest-fill.win { background: linear-gradient(90deg, var(--hardwood-bright), var(--whistle)); }
 .recruit-card .row.spread { align-items: flex-start; }
 
+ul.plain { list-style: none; margin: 0; padding: 0; }
+ul.plain li { padding: 5px 0; border-bottom: 1px solid var(--line); }
+ul.plain li:last-child { border-bottom: none; }
+
 /* Utility */
 .muted { color: var(--chalk-dim); }
 .mono { font-family: var(--font-mono); }

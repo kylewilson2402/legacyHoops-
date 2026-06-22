@@ -30,6 +30,7 @@ app.use('/api/schedule', require('./src/routes/schedule'));
 app.use('/api/sim', require('./src/routes/sim'));
 app.use('/api/recruiting', require('./src/routes/recruiting'));
 app.use('/api/news', require('./src/routes/news'));
+app.use('/api/history', require('./src/routes/history'));
 
 // ---------------------------------------------------------------------------
 // Static SPA
