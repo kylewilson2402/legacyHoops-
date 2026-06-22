@@ -4,6 +4,7 @@
 
 import { state } from './state.js';
 import { apiGet, apiPost } from './api.js';
+import { toast } from './components/ui.js';
 
 const routes = {
   home:         () => import('./views/home.js'),
@@ -94,9 +95,11 @@ topbarSim.addEventListener('click', async () => {
   topbarSim.disabled = true;
   topbarSim.textContent = 'Simulating…';
   try {
-    await apiPost('/api/sim/next', { careerId: id });
+    const r = await apiPost('/api/sim/next', { careerId: id });
+    if (r && r.recap) toast(`${r.recap.away.abbrev} ${r.recap.away.score} — ${r.recap.home.score} ${r.recap.home.abbrev}`, 'win');
+    else if (r && r.champion_team_id) toast('Season complete — a champion is crowned!', 'win');
   } catch (e) {
-    console.error(e);
+    toast(e.message, 'error');
   }
   refresh();
 });

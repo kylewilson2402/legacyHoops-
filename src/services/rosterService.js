@@ -218,8 +218,30 @@ function getPlayerProfile(careerId, playerId) {
   return { player, team, stats };
 }
 
+// Per-game stat leaders for a team in a season (for the dashboard).
+function getTeamLeaders(careerId, teamId, seasonYear) {
+  const c = db.prepare('SELECT season_year FROM careers WHERE id=?').get(careerId);
+  const year = seasonYear || c.season_year;
+  const rows = db.prepare(`
+    SELECT p.id, p.first, p.last, p.position,
+           COUNT(*) gp,
+           ROUND(AVG(pgs.pts),1) ppg, ROUND(AVG(pgs.reb),1) rpg, ROUND(AVG(pgs.ast),1) apg
+    FROM player_game_stats pgs
+    JOIN games g ON g.id = pgs.game_id
+    JOIN players p ON p.id = pgs.player_id
+    WHERE pgs.team_id=? AND g.career_id=? AND g.season_year=? AND pgs.min>0
+    GROUP BY p.id`).all(teamId, careerId, year);
+  if (!rows.length) return { scorers: [], rebounder: null, assister: null };
+  const top = (key) => [...rows].sort((a, b) => b[key] - a[key]);
+  return {
+    scorers: top('ppg').slice(0, 3),
+    rebounder: top('rpg')[0],
+    assister: top('apg')[0],
+  };
+}
+
 module.exports = {
   generateRoster, getRoster, computeOverall, POS_WEIGHTS, ATTRS,
   setLineup, setMinutes, setStrategy, getTeamSettings, getUserTeamId,
-  getPlayerProfile, OFFENSIVE_STYLES, DEFENSIVE_STYLES, TEMPOS, MAX_MINUTES,
+  getPlayerProfile, getTeamLeaders, OFFENSIVE_STYLES, DEFENSIVE_STYLES, TEMPOS, MAX_MINUTES,
 };

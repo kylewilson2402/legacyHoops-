@@ -1,7 +1,25 @@
-import { apiGet, apiDelete } from '../api.js';
+import { apiGet, apiPost, apiDelete } from '../api.js';
 import { state } from '../state.js';
 import { updateTopbar } from '../app.js';
-import { pageHead, emptyState, esc } from '../components/ui.js';
+import { pageHead, emptyState, esc, toast } from '../components/ui.js';
+
+// Quick-start a reviewer-friendly career with a fixed seed.
+async function startDemo(container) {
+  const existing = (await apiGet('/api/careers')).find((c) => c.coach === 'Casey Demo');
+  let career, team;
+  if (existing) {
+    ({ career, team } = await apiGet(`/api/careers/${existing.id}`));
+  } else {
+    ({ career, team } = await apiPost('/api/careers', {
+      coachFirst: 'Casey', coachLast: 'Demo', coachAge: 40,
+      archetype: 'Tactician', teamCity: 'Oak Hill', teamMascot: 'Hawks', seed: 12345,
+    }));
+  }
+  state.setCareer(career);
+  updateTopbar(career, team);
+  toast('Demo career ready — welcome to Oak Hill!', 'win');
+  location.hash = '#/dashboard';
+}
 
 export async function render(container) {
   const careers = await apiGet('/api/careers');
@@ -9,16 +27,18 @@ export async function render(container) {
   const head = pageHead(
     'Welcome to Legacy Hoops',
     'Take over a high school program and build a dynasty.',
-    `<a class="btn btn-primary" href="#/coach-create">+ New career</a>`
+    `<button class="btn" id="demoBtn">Demo career</button>
+     <a class="btn btn-primary" href="#/coach-create">+ New career</a>`
   );
 
   if (!careers.length) {
     container.innerHTML = head + `<div class="card">${emptyState(
       '🏀',
-      'No careers yet. Create a coach, pick a program, and start your dynasty.',
+      'No careers yet. Create a coach and pick a program — or jump straight in with a demo career.',
       '#/coach-create', 'Create your coach'
     )}</div>`;
     updateTopbar(null, null);
+    container.querySelector('#demoBtn').addEventListener('click', () => startDemo(container));
     return;
   }
 
@@ -47,6 +67,8 @@ export async function render(container) {
 
   container.innerHTML = head + `<div class="grid grid-auto">${cards}</div>`;
   updateTopbar(null, null);
+
+  container.querySelector('#demoBtn').addEventListener('click', () => startDemo(container));
 
   container.querySelectorAll('[data-load]').forEach((b) => {
     b.addEventListener('click', async () => {

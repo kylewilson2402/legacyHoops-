@@ -1,6 +1,6 @@
 const express = require('express');
 const {
-  getRoster, getTeamSettings, getUserTeamId, getPlayerProfile,
+  getRoster, getTeamSettings, getPlayerProfile, getTeamLeaders,
   setLineup, setMinutes, setStrategy,
   OFFENSIVE_STYLES, DEFENSIVE_STYLES, TEMPOS, MAX_MINUTES,
 } = require('../services/rosterService');
@@ -20,6 +20,15 @@ router.get('/player/:careerId/:playerId', (req, res) => {
     res.json({ ok: true, data: getPlayerProfile(Number(req.params.careerId), Number(req.params.playerId)) });
   } catch (err) {
     res.status(404).json({ ok: false, error: err.message });
+  }
+});
+
+// GET /api/roster/:careerId/:teamId/leaders — per-game stat leaders
+router.get('/:careerId/:teamId/leaders', (req, res) => {
+  try {
+    res.json({ ok: true, data: getTeamLeaders(Number(req.params.careerId), Number(req.params.teamId)) });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
   }
 });
 

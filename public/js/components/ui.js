@@ -25,6 +25,22 @@ export function emptyState(emoji, text, ctaHref, ctaLabel) {
   </div>`;
 }
 
+// Lightweight toast notifications. type: 'info' | 'win' | 'error'.
+export function toast(message, type = 'info') {
+  let host = document.getElementById('toastHost');
+  if (!host) {
+    host = document.createElement('div');
+    host.id = 'toastHost';
+    host.className = 'toast-host';
+    document.body.appendChild(host);
+  }
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.textContent = message;
+  host.appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 250); }, 2800);
+}
+
 // Placeholder used by Phase 1 stubs.
 export function placeholder(container, title, note) {
   container.innerHTML = pageHead(title, note || 'Coming together phase by phase.')

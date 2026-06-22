@@ -404,6 +404,26 @@ table.stat .min-input {
   .bottom-nav a.active { opacity: 1; background: var(--panel-2); }
 }
 
+/* Toasts */
+.toast-host { position: fixed; bottom: 18px; right: 18px; z-index: 60; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  background: var(--panel-2); color: var(--chalk); border: 1px solid var(--line);
+  border-left: 3px solid var(--hardwood); padding: 11px 15px; border-radius: var(--r-sm);
+  box-shadow: var(--shadow); font-size: .9rem; max-width: 320px;
+  animation: toastIn .22s ease;
+}
+.toast-win { border-left-color: var(--whistle); }
+.toast-error { border-left-color: var(--foul); }
+.toast.out { opacity: 0; transform: translateY(6px); transition: opacity .25s, transform .25s; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 860px) { .toast-host { left: 12px; right: 12px; bottom: 76px; } }
+
+/* Gentle view transition + scorebug entrance */
+.view { animation: viewIn .22s ease; }
+@keyframes viewIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.scorebug { animation: bugIn .25s ease; }
+@keyframes bugIn { from { opacity: 0; transform: scale(.985); } to { opacity: 1; transform: none; } }
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }

@@ -1,16 +1,17 @@
 import { apiGet, apiPost } from '../api.js';
 import { loadActiveCareer } from '../components/career.js';
-import { pageHead, gameToScorebug, esc, emptyState } from '../components/ui.js';
+import { pageHead, gameToScorebug, esc, emptyState, toast } from '../components/ui.js';
 
 export async function render(container) {
   const ctx = await loadActiveCareer(container, 'Dashboard');
   if (!ctx) return;
   const { career, team } = ctx;
 
-  const [standings, games, news] = await Promise.all([
+  const [standings, games, news, leaders] = await Promise.all([
     apiGet(`/api/schedule/${career.id}/standings`),
     apiGet(`/api/schedule/${career.id}`),
     apiGet(`/api/news/${career.id}?limit=4`),
+    apiGet(`/api/roster/${career.id}/${team.id}/leaders`),
   ]);
 
   const me = standings.find((s) => s.team_id === team.id) || { wins: 0, losses: 0, rank: '-', diff: 0, streak: 0 };
@@ -64,14 +65,30 @@ export async function render(container) {
       : emptyState('📰', 'No news yet — simulate to make headlines.')}
   </div>`;
 
+  // Team leaders.
+  const leaderRow = (label, p, stat, val) => p
+    ? `<div class="news-mini"><span class="tag">${label}</span><a href="#/player/${p.id}">${esc(p.first)} ${esc(p.last)}</a><span class="mono muted" style="margin-left:auto">${val} ${stat}</span></div>`
+    : `<div class="news-mini muted">${label}: —</div>`;
+  const leadersCard = `<div class="card">
+    <div class="eyebrow">Team leaders</div>
+    <div class="stack" style="margin-top:8px">
+      ${leaders.scorers.length ? leaders.scorers.map((p, i) => leaderRow(i === 0 ? 'PTS' : `#${i + 1}`, p, 'ppg', p.ppg)).join('') : '<div class="news-mini muted">No games played yet.</div>'}
+      ${leaders.rebounder ? leaderRow('REB', leaders.rebounder, 'rpg', leaders.rebounder.rpg) : ''}
+      ${leaders.assister ? leaderRow('AST', leaders.assister, 'apg', leaders.assister.apg) : ''}
+    </div>
+  </div>`;
+
   container.innerHTML = pageHead(`${team.name}`, `Coach ${esc(career.coach_first)} ${esc(career.coach_last)} · ${esc(career.archetype)}`)
     + `<div class="grid grid-3">${recordCard}${lastCard}${nextCard}</div>`
-    + `<div class="grid grid-2" style="margin-top:16px">${progress}${newsWidget}</div>`;
+    + `<div class="grid grid-3" style="margin-top:16px">${progress}${leadersCard}${newsWidget}</div>`;
 
   const ds = container.querySelector('#dashSim');
   if (ds) ds.addEventListener('click', async () => {
     ds.disabled = true; ds.textContent = 'Simulating…';
-    try { await apiPost('/api/sim/next', { careerId: career.id }); } catch (e) { console.error(e); }
+    try {
+      const r = await apiPost('/api/sim/next', { careerId: career.id });
+      if (r.recap) toast(`${r.recap.away.abbrev} ${r.recap.away.score} — ${r.recap.home.score} ${r.recap.home.abbrev}`, 'win');
+    } catch (e) { toast(e.message, 'error'); }
     render(container);
   });
 
@@ -81,7 +98,7 @@ export async function render(container) {
     try {
       const summary = await apiPost(`/api/careers/${career.id}/advance`, {});
       renderOffseason(container, summary, career.season_year);
-    } catch (e) { adv.disabled = false; adv.textContent = 'Advance to next season'; console.error(e); }
+    } catch (e) { adv.disabled = false; adv.textContent = 'Advance to next season'; toast(e.message, 'error'); }
   });
 }
 
